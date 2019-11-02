@@ -10,6 +10,14 @@ state(breads).
 % state for toppings that can be choosen multiple times
 counter(0).
 
+% User Experience
+printhelpnote():- print("Type helpsubway(). for help!"), put(10).
+
+helpsubway():-
+    print("Use options(<parts-of-your-sandwich>). to get the information about all items."),put(10),
+    print("parts-of-your-sandwich: breads, main, veggies, sauce, sides"), put(10),
+    print("Use selected(<option>,<parts-of-your-sandwich>). to choose your items.").
+
 
 % compute suggested Options
 suggested(L, Output) :-
@@ -44,7 +52,7 @@ selected(0) :-
     ->  retract(state(breads)),
         assert(state(main)),
         print("Choose the main topping now!"),
-        put(10)
+        put(10), printhelpnote()
     ;   X==main
     ->  retract(state(main)),
         assert(state(veggies)),
