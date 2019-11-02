@@ -1,15 +1,19 @@
-:- (dynamic liked/1).
+:- (dynamic collection/1).
 :- (dynamic state/1).
+:- (dynamic counter/1).
+
 
 % listed with all selected items
-liked(nothing).
+collection(nothing).
 % state for asking the reight questions
 state(breads).
+% state for toppings that can be choosen multiple times
+counter(0).
 
 
 % compute suggested Options
 suggested(L, Output) :-
-    findnsols(100, X, liked(X), Z),
+    findnsols(100, X, collection(X), Z),
     (   member(healthy, Z)
     ->  findnsols(100, Y, healthytrack(L, Y), Output)
     ;   member(veggie, Z)
@@ -25,6 +29,7 @@ options(Name) :-
     print("The following options are available for your order:"),
     options_(Lst).
 
+% helper function to display the items in multiple lines
 options_([]).
 options_([Head|Tail]) :-
     print(Head),
@@ -45,18 +50,26 @@ selected(0) :-
         assert(state(veggies)),
         print("Choose the vegetables now!"),
         put(10)
-    ;   X==veggies
-    ->  print("Do you want to choose more veggetables? [y/n]"),
-        read(Like),
-        (   Like==y
-        ->  print("OK")
-        ),
-        retract(state(veggies)),
-        assert(state(sauce)),
-        print("Choose the sauce now!"),
-        put(10)
+    ;   
+    % specific case for veggies. There can be more than one item selected
+    X==veggies
+    -> 
+        counter(Number),
+        maxVeggies(Max), 
+        (
+            (
+            % Ask for another veggie topping
+            Number < Max -> print("Do you want to choose more veggetables? [y/n]"),
+            read(Like),
+                Like==y
+            ->  retract(counter(Number)), assert(counter(Number + 1)), print("OK, You can choose "); true);
+            % continue with the next case, set new state
+            retract(state(veggies)),
+            assert(state(sauce)),
+            print("Choose the sauce now!"),
+            put(10)
+        )
     ;
-   %         );
    X==sauce
     ->  retract(state(sauce)),
         assert(state(sides)),
@@ -66,8 +79,8 @@ selected(0) :-
     ->  retract(state(sides)),
         assert(state(breads)),
         done(1),
-        abolish(liked/1),
-        assert(liked(nothing)),
+        abolish(collection/1),
+        assert(collection(nothing)),
         print("Thanks for eating at Subway"),
         put(10)
     ).
@@ -92,11 +105,11 @@ selected(X, L) :-
     ).
 
 addToSelection(X) :-
-    (   liked(Y),
+    (   collection(Y),
         Y==nothing
-    ->  retract(liked(Y)),
-        assert(liked(X))
-    ;   assert(liked(X))
+    ->  retract(collection(Y)),
+        assert(collection(X))
+    ;   assert(collection(X))
     ).
 
 
@@ -104,7 +117,7 @@ addToSelection(X) :-
 done(1) :-
     print("You selected:"),
     put(10),
-    findnsols(100, Y, liked(Y), History),
+    findnsols(100, Y, collection(Y), History),
     options_(History),
     put(10).
 
@@ -121,9 +134,17 @@ healthytrack(Lst, X) :-
 
 
 % Knowledge base
+
+% Max for Veggie selection
+maxVeggies(3).
+
+
+% everything that is allowed in a specific track
 veggiemember([lettuce, tomato, mustard, chipotle, bbq, mayonaise, chilli, soda, cookie, apple]).
 healthymember([lettuce, tomato, chipotle, bbq, chilli, soda, apple]).
 
+
+% offers
 breads([parmesan, honeywheat, italian]).
 main([chicken, tuna, veggie, italian_bmt, healthy]).
 veggies([lettuce, tomato]).
