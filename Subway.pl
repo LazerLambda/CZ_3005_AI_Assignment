@@ -69,9 +69,11 @@ selected(0) :-
             (
             % Ask for another veggie topping
             Number < Max -> print("Do you want to choose more? [y/n]"),
-            read(Like),
+                read(Like),
                 Like==y
-            ->  retract(counter(Number)), assert(counter(Number + 1)), print("OK, You can choose "); true);
+                ->  retract(counter(Number)), 
+                    assert(counter(Number + 1))
+                    );
             % continue with the next case, set new state
             retract(state(veggies)),
             assert(state(sauce)),
@@ -88,6 +90,9 @@ selected(0) :-
     ->  retract(state(sides)),
         assert(state(breads)),
         done(1),
+        % reset states
+        abolish(counter/1),
+        assert(counter(0)),
         abolish(collection/1),
         assert(collection(nothing)),
         print("Thanks for eating at Subway"),
