@@ -46,17 +46,18 @@ options_([Head|Tail]) :-
     options_(Tail).
 
 
+% change state
+switchState(X,Y):- retract(state(X)), assert(state(Y)).
+
 % switch state -> next selection
 selected(0) :-
     state(X),
     (   X==breads
-    ->  retract(state(breads)),
-        assert(state(main)),
+    ->  switchState(breads, main),
         print("Choose the main topping now!"),
         put(10), printhelpnote()
     ;   X==main
-    ->  retract(state(main)),
-        assert(state(veggies)),
+    ->  switchState(main, veggies),
         print("Choose the vegetables now!"),
         put(10)
     ;   
@@ -75,20 +76,17 @@ selected(0) :-
                     assert(counter(Number + 1))
                     );
             % continue with the next case, set new state
-            retract(state(veggies)),
-            assert(state(sauce)),
+            switchState(veggies, sauce),
             print("Choose the sauce now!"),
             put(10)
         )
     ;
    X==sauce
-    ->  retract(state(sauce)),
-        assert(state(sides)),
+    ->  switchState(sauce, sides),
         print("Choose the sides now!"),
         put(10)
     ;   X==sides
-    ->  retract(state(sides)),
-        assert(state(breads)),
+    ->  switchState(sides, breads),
         done(1),
         % reset states
         abolish(counter/1),
