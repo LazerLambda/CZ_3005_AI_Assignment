@@ -2,6 +2,7 @@
 :- (dynamic state/1).
 :- (dynamic counter/1).
 
+main:- helpsubway().
 
 % listed with all selected items
 collection(nothing).
@@ -67,7 +68,7 @@ selected(0) :-
         (
             (
             % Ask for another veggie topping
-            Number < Max -> print("Do you want to choose more veggetables? [y/n]"),
+            Number < Max -> print("Do you want to choose more? [y/n]"),
             read(Like),
                 Like==y
             ->  retract(counter(Number)), assert(counter(Number + 1)), print("OK, You can choose "); true);
@@ -127,7 +128,8 @@ done(1) :-
     put(10),
     findnsols(100, Y, collection(Y), History),
     options_(History),
-    put(10).
+    put(10),
+    printhelpnote().
 
 
 % specific tracks

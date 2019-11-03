@@ -1,0 +1,49 @@
+\documentclass{article}
+
+\title{Assignment Artificial Intelligence CZ3005 \\ Subway sandwich interactor}
+\date{2019 \\ November}
+\author{Koch Philipp Frederik Edward, N1903454H}
+
+% settings
+\linespread{1.5}
+
+% imports
+\usepackage{listings}
+\usepackage{color}
+
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+	lineskip={-1.5pt},
+	language=Prolog,
+	numbers=left,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	lineskip={-1.5pt},
+	breaklines=true,
+	breakatwhitespace=true,
+	frame=single
+}
+
+
+\begin{document}
+	\maketitle
+	\section{Task}
+	The goal of the task was the implementation of a subway sandwich interactor. This was to guide the customer through the selection. It had to be taken into account that some options could be chosen more often, such as the chosen vegetable. Furthermore, a restriction must be made by previously selected options, so that no meat-containing ingredients are permitted in the vegetarian menu. Assistance was offered for the task, which was also used. An options/1 rule and a selected/2 rule were proposed in the notes. The options/1 rule should offer the possible options for the respective sandwich part and the selected/2 rule should assign an option for the respective sandwich part. selected(0) should trigger a jump on the list of sandwich parts and initiate the next assignment. If X = 1, a done/1 rule should display the options already selected. 
+
+	\section{Implementation}
+	The hints described above are very suitable for a command line based dialog program and were therefore chosen as the basis for the following implementation. For this type of program, where a rule is called again each time, an abstracted state is indispensable. The selected properties of the sandwich, the state of the selection and the number of possible reusable options must be saved. Therefore, three predicates were chosen, which should manage these states during runtime. The used predicates are shown in the following code. Both predicates state/1 and counter/1 where only used with one Variable, so that the state is first retracted and then newly asserted.
+	
+	
+	\lstinputlisting[linerange=1-12, title=Dynamic Predicates]{Subway.pl}
+	
+	Since the list is to be changed with selected(0), the central state management was implemented here.
+	
+	\lstinputlisting[linerange=49-95, title=selected(0)]{Subway.pl}
+	\section{Documentation}
+\end{document}
