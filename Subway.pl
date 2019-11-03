@@ -46,9 +46,6 @@ options_([Head|Tail]) :-
     options_(Tail).
 
 
-% change state
-switchState(X,Y):- retract(state(X)), assert(state(Y)).
-
 % switch state -> next selection
 selected(0) :-
     state(X),
@@ -64,17 +61,8 @@ selected(0) :-
     % specific case for veggies. There can be more than one item selected
     X==veggies
     -> 
-        counter(Number),
-        maxVeggies(Max), 
         (
-            (
-            % Ask for another veggie topping
-            Number < Max -> print("Do you want to choose more? [y/n]"),
-                read(Like),
-                Like==y
-                ->  retract(counter(Number)), 
-                    assert(counter(Number + 1))
-                    );
+            mulitpleSelection(maxVeggies);
             % continue with the next case, set new state
             switchState(veggies, sauce),
             print("Choose the sauce now!"),
@@ -95,6 +83,23 @@ selected(0) :-
         assert(collection(nothing)),
         print("Thanks for eating at Subway"),
         put(10)
+    ).
+
+% change state
+switchState(X,Y):- retract(state(X)), assert(state(Y)).
+
+% Rule for multiple selection
+mulitpleSelection(MaxPred):-
+    call(MaxPred, MAX), 
+    counter(Number),
+    (
+    % Ask for more toppings
+    Number < MAX -> 
+        print("Do you want to choose more? [y/n]"),
+        read(Like),
+        Like==y
+        ->  retract(counter(Number)), 
+            assert(counter(Number + 1))
     ).
 
 
