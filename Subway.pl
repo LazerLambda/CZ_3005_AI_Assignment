@@ -90,6 +90,9 @@ selected(0) :-
         done(1),
         abolish(collection/1),
         assert(collection(nothing)),
+        counter(Y),
+        retract(counter(Y)),
+        assert(counter(0)),
         print("Thanks for eating at Subway"),
         put(10)
     ).
