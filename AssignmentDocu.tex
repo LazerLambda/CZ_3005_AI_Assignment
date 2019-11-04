@@ -12,18 +12,18 @@
 \usepackage{color}
 
 
-\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{orange}{rgb}{0.9531,0.39, 0.14}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
-\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{green}{rgb}{0,0.6,0}
 
 \lstset{
-	lineskip={-1.5pt},
+	basicstyle=\tiny,
 	language=Prolog,
 	numbers=left,
 	numberstyle=\tiny\color{gray},
 	keywordstyle=\color{blue},
-	commentstyle=\color{dkgreen},
-	stringstyle=\color{mauve},
+	commentstyle=\color{orange},
+	stringstyle=\color{green},
 	lineskip={-1.5pt},
 	breaklines=true,
 	breakatwhitespace=true,
@@ -37,42 +37,14 @@
 	The goal of the task was the implementation of a subway sandwich interactor. This was to guide the customer through the selection. It had to be taken into account that some options could be chosen more often, such as the chosen vegetable. Furthermore, a restriction must be made by previously selected options, so that no meat-containing ingredients are permitted in the vegetarian menu. Assistance was offered for the task, which was also used. An \textit{options/1} rule and a \textit{selected/2} rule were proposed in the notes. The \textit{options/1} rule should offer the possible options for the respective sandwich part and the \textit{selected/2} rule should assign an option for the respective sandwich part. \textit{selected(0)} should trigger a jump on the list of sandwich parts and initiate the next assignment. If X = 1, a \textit{done/1} rule should display the options already selected. 
 
 	\section{Implementation}
-	The hints described above are very suitable for a command line based dialog program and were therefore chosen as the basis for the following implementation. For this type of program, where a rule is called again each time, an abstracted state is indispensable. The selected properties of the sandwich, the state of the selection and the number of possible reusable options must be saved. Therefore, three predicates were chosen, which should manage these states during runtime. The used predicates are shown in the following code. Both predicates state/1 and counter/1 where only used with one Variable, so that the state is first retracted and then newly asserted.
-	
-	
-	\lstinputlisting[linerange=1-12, title=Dynamic Predicates]{Subway.pl}
-	
-	Since the list is to be changed with \textit{selected(0)}, the central state management was implemented here. Here the respective state is changed again and again by the next one and at the end is set again to the beginning. What is special about this method is the treatment of the last state, where the \textit{collection/1} is reset, and the treatment in state veggie, where multiple selection is allowed. The \textit{counter/1} predicate is also used by limiting the multiple selection. Finally, as with \textit{collection/1}, \textit{counter/1} is reset.
-	
-	\lstinputlisting[linerange=49-98, title=selected(0) Rule]{Subway.pl}
-	
-	In the \textit{selected/2} rule, the selected option is added to the \textit{collection/1} predicate. For this purpose, the corresponding list in the knowledge base is determined via \textit{call/2} and then the list is compared with  the current state.
-	If the state is correct, a list of possible options is created, which is then used as a reference. If the selected item is then in the created list, this option is added to the \textit{collection/1} via \textit{addToSelection/1}. 
-	
-	\lstinputlisting[linerange=101-117, title=selected/2 Rule]{Subway.pl}
-	
-	\lstinputlisting[linerange=119-125, title=addToSelection/1 Rule]{Subway.pl}
-	
-	The suggested/2 rule filters the results based on the previous choice. First a list of the collection/1 predicate is created with the findnsols/4 rule and then checked if a certain choice has been made. If a choice was detected which is connected to a certain track, this track is returned here as output. Otherwise, the entered list is returned without modification.
-	
-	\lstinputlisting[linerange=23-31, title=suggested/2 Rule]{Subway.pl}
-	
-	Furthermore the different tracks are needed, as well as the rules for the specific tracks. For the specific tracks, a list of allowed options is created.
-	
-	\lstinputlisting[linerange=138 - 165, title=Knowledge Base and specific tracks]{Subway.pl}
-	
-	With the previous rules an endless operation is possible. In the following, auxiliary rules are considered, which simplify the interaction for the user.\\
-	The \textit{done(1)} rule can be used to output the currently selected list. First, \textit{collection/1} is output as a list via the function \textit{findnsols/4}, where a certain size of a chunk is output in a list. \textit{Options\char`_/1} then outputs the elements in several lines. put(10) breaks the line and s\textit{printhelpnote()} outputs a hint to the help rule.
-	
-	\lstinputlisting[linerange=128-135, title=done/1 Rule]{Subway.pl}
-	
-	Furthermore the rule \textit{options/1} was implemented, which outputs a list in several points. In each call the head of the list is output and the \textit{options\char`_/1} rule is called again with the tail of the list. 
-	
-	\lstinputlisting[linerange=41-46, title=options\char`_/1 Rule]{Subway.pl}
-	
+	The hints described above are very suitable for a command line based dialog program and were therefore chosen as the basis for the following implementation. For this type of program, where a rule is called again each time, an abstracted state is indispensable. The selected properties of the sandwich, the state of the selection and the number of possible reusable options must be saved. Therefore, three predicates were chosen, which should manage these states during runtime. The used predicates are shown in the following code. Both predicates state/1 and counter/1 where only used with one Variable, so that the state is first retracted and then newly asserted.\\
+	Since the list is to be changed with \textit{selected(0)}, the central state management was implemented here. Here the respective state is changed again and again by the next one and at the end is set again to the beginning.To change the state the rule \textit{switchState/2} was implemented. What is special about this method is the treatment of the last state, where the \textit{collection/1} is reset, and the treatment in state veggie, where multiple selection is allowed. The more detailed treatment of a multi-selection is usually defined as \textit{multipleSelection/1}. The \textit{counter/1} predicate is also used by limiting the multiple selection. Finally, as with \textit{collection/1}, \textit{counter/1} is reset.\\
+	In the \textit{selected/2} rule, the selected option is added to the \textit{collection/1} predicate. For this purpose, the corresponding list in the knowledge base is determined via \textit{call/2} and then the list is compared with  the current state. \\
+	If the state is correct, a list of possible options is created, which is then used as a reference. If the selected item is then in the created list, this option is added to the \textit{collection/1} via \textit{addToSelection/1}. The suggested/2 rule filters the results based on the previous choice. First a list of the collection/1 predicate is created with the findnsols/4 rule and then checked if a certain choice has been made. If a choice was detected which is connected to a certain track, this track is returned here as output. Otherwise, the entered list is returned without modification. Furthermore the different tracks are needed, as well as the rules for the specific tracks. For the specific tracks, a list of allowed options is created. With the previous rules an endless operation is possible. In the following, auxiliary rules are considered, which simplify the interaction for the user.\\
+	The \textit{done(1)} rule can be used to output the currently selected list. First, \textit{collection/1} is output as a list via the function \textit{findnsols/4}, where a certain size of a chunk is output in a list. \textit{Options\char`_/1} then outputs the elements in several lines. put(10) breaks the line and s\textit{printhelpnote()} outputs a hint to the help rule. Furthermore the rule \textit{options/1} was implemented, which outputs a list in several points. In each call the head of the list is output and the \textit{options\char`_/1} rule is called again with the tail of the list. 
 	In order to simplify the interaction, the following rules were also drawn up, but they only output information as text.
 	
-	\lstinputlisting[linerange=14-20, title=UX]{Subway.pl}
+	\lstinputlisting[title=Code]{Subway.pl}
 	
 	\section{Documentation}
 	
@@ -87,4 +59,6 @@
 	 can be selected. In between, the state can be queried again and again with \textit{done(1)} and \textit{options/1} can display the possible options for a step. The selection takes place with \textit{selected/2}.
 	
 	\section{Conclusion}
+	With this architecture, any number of options and parts can be added, using the implemented rules. This would allow you to make multiple selections simply by using the \textit{mulitpleSelection/2} rules and customizing the states. It would also be possible to add more tracks by simply adding the track and observing the \textit{suggested/1} rule.
+
 \end{document}
