@@ -165,8 +165,8 @@ healthymember([lettuce, tomato, chipotle, bbq, chilli, soda, apple]).
 
 
 % offers
-breads([parmesan, honeywheat, italian]).
+breads([parmesan, honeywheat, italian, cheddar, flatbread, honeyoat]).
 main([chicken, tuna, veggie, italian_bmt, healthy]).
-veggies([lettuce, tomato]).
-sauce([mustard, chipotle, bbq, mayonaise, chilli]).
+veggies([cucumber, lettuce, tomato, jalapeno, spinach]).
+sauce([mustard, chipotle, bbq, mayonaise, chilli, cesarsauce]).
 sides([soup, soda, cookie, apple]).
