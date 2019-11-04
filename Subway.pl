@@ -50,44 +50,35 @@ options_([Head|Tail]) :-
 selected(0) :-
     state(X),
     (   X==breads
-    ->  retract(state(breads)),
-        assert(state(main)),
+    ->  switchState(breads, main),
         print("Choose the main topping now!"),
         put(10), printhelpnote()
     ;   X==main
-    ->  retract(state(main)),
-        assert(state(veggies)),
+    ->  switchState(main, veggies),
         print("Choose the vegetables now!"),
         put(10)
     ;   
     % specific case for veggies. There can be more than one item selected
     X==veggies
     -> 
-        counter(Number),
-        maxVeggies(Max), 
         (
-            (
-            % Ask for another veggie topping
-            Number < Max -> print("Do you want to choose more? [y/n]"),
-            read(Like),
-                Like==y
-            ->  retract(counter(Number)), assert(counter(Number + 1)), print("OK, You can choose "); true);
+            mulitpleSelection(maxVeggies);
             % continue with the next case, set new state
-            retract(state(veggies)),
-            assert(state(sauce)),
+            switchState(veggies, sauce),
             print("Choose the sauce now!"),
             put(10)
         )
     ;
    X==sauce
-    ->  retract(state(sauce)),
-        assert(state(sides)),
+    ->  switchState(sauce, sides),
         print("Choose the sides now!"),
         put(10)
     ;   X==sides
-    ->  retract(state(sides)),
-        assert(state(breads)),
+    ->  switchState(sides, breads),
         done(1),
+        % reset states
+        abolish(counter/1),
+        assert(counter(0)),
         abolish(collection/1),
         assert(collection(nothing)),
         counter(Y),
@@ -95,6 +86,23 @@ selected(0) :-
         assert(counter(0)),
         print("Thanks for eating at Subway"),
         put(10)
+    ).
+
+% change state
+switchState(X,Y):- retract(state(X)), assert(state(Y)).
+
+% Rule for multiple selection
+mulitpleSelection(MaxPred):-
+    call(MaxPred, MAX), 
+    counter(Number),
+    (
+    % Ask for more toppings
+    Number < MAX -> 
+        print("Do you want to choose more? [y/n]"),
+        read(Like),
+        Like==y
+        ->  retract(counter(Number)), 
+            assert(counter(Number + 1))
     ).
 
 
